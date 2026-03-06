@@ -13,26 +13,29 @@
         i { font-family: 'xeicon' !important; }
 
         body { 
-            background-color: #fff; font-family: 'PT Sans', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: #fff; 
+            font-family: 'PT Sans', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; 
             margin: 0; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             min-height: 100vh; 
+            -webkit-font-smoothing: antialiased;
         }
 
+        /* [반응형 수정] 고정 너비를 제거하고 %와 max-width 사용 */
         #capture-area {
             background: #fff;
-            padding: 50px 100px 100px 100px; 
+            padding: 8vw 5vw 8vw 5vw; 
             width: 100%;
+            max-width: 900px; /* PC에서도 너무 퍼지지 않게 제한 */
             display: flex;
             flex-direction: column;
             align-items: center;
-            max-width: 700px;
         }
 
         .user-id-wrapper { 
-            margin-bottom: 40px; 
+            margin-bottom: 6vw; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -40,12 +43,8 @@
             width: 100%;
         }
 
-        .user-id-prefix { 
-            font-weight: bold; 
-            font-size: 28px; 
-            color: #000;
-            line-height: 1.2;
-        }
+        .user-id-prefix { font-weight: bold; font-size: clamp(20px, 5vw, 32px); color: #000; line-height: 1.2; }
+        .user-id-edit { font-size: clamp(20px, 5vw, 32px); color: #000; }
 
         .editable-div {
             outline: none;
@@ -55,11 +54,9 @@
             display: inline-block;
             min-width: 10px;
             line-height: 1.3;
-            word-break: break-all; /* 단어가 길어도 줄바꿈 */
-            white-space: pre-wrap; /* 공백 및 줄바꿈 유지 */
+            word-break: break-all;
+            white-space: pre-wrap;
         }
-
-        .user-id-edit { font-size: 28px; color: #000; }
 
         [contenteditable="true"]:empty:before {
             content: attr(placeholder);
@@ -67,21 +64,22 @@
             display: block;
         }
 
+        /* 그리드 간격도 반응형으로 조절 */
         .grid-board { 
             display: flex; 
             flex-wrap: wrap; 
             width: 100%; 
-            column-gap: 15px; 
-            row-gap: 30px; /* 세로 간격을 조금 더 넉넉히 */
+            column-gap: 3%; 
+            row-gap: 5vw;
             justify-content: center;
-            align-items: flex-start; /* 텍스트 길이에 따라 높이가 달라도 정렬 유지 */
+            align-items: flex-start;
         }
 
         .card-unit { 
-            width: calc((100% - (15px * 2)) / 3);
+            width: 31.33%; /* 3개 배치 (31.33*3 + 3*2 = 약 100) */
             display: flex; 
             flex-direction: column; 
-            gap: 8px; 
+            gap: 1.5vw; 
             min-width: 0;
         }
 
@@ -93,38 +91,20 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            border: 2px solid #000; 
+            border: clamp(2px, 0.5vw, 4px) solid #000; 
             overflow: hidden; 
         }
 
-        /* 제목 영역이 길어지면 자동으로 아래로 밀림 */
-        .info-area {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            width: 100%;
-        }
+        .info-area { display: flex; flex-direction: column; gap: 0.5vw; width: 100%; }
+        .title-edit { font-size: clamp(10px, 2.5vw, 14px); color: #000; width: 100%; }
+        .author-edit { font-size: clamp(10px, 1.8vw, 14px); color: #666; width: 100%; }
 
-        .title-edit { font-size: 18px; color: #000; width: 100%; }
-        .author-edit { font-size: 13px; color: #666; width: 100%; }
-
-        @media (min-width: 681px) { .image-container { border-width: 4px; } }
-        
-        @media (max-width: 680px) {
-            #capture-area { padding: 30px 10px 80px 10px; }
-            .grid-board { column-gap: 8px; row-gap: 20px; }
-            .card-unit { width: calc((100% - (8px * 2)) / 3); }
-            .user-id-prefix, .user-id-edit { font-size: 22px; }
-            .title-edit { font-size: 14px; }
-            .author-edit { font-size: 11px; }
-        }
-        
-        .xi-plus-circle { font-size: 40px; color: #000; }
+        .xi-plus-circle { font-size: clamp(10px, 6vw, 14px); color: #000; }
         .preview-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; display: none; }
         .file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 3; }
 
-        .controls { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1000; }
-        .btn-save { width: 65px; height: 65px; font-size: 30px; background: #000; color: #fff; border: none; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .controls { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; }
+        .btn-save { width: 65px; height: 65px; font-size: 30px; background: #000; color: #fff; border: none; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
     </style>
 </head>
 <body>
@@ -146,20 +126,13 @@
 <script>
     const grid = document.getElementById('gridBoard');
 
-    // 텍스트 데이터 저장 함수
-    function saveTextData(key, value) {
-        localStorage.setItem(key, value);
-    }
-
-    // 초기 로드 시 텍스트 복원
+    function saveTextData(key, value) { localStorage.setItem(key, value); }
     function loadTextData(id) {
         const saved = localStorage.getItem(id);
-        if (saved) {
-            document.getElementById(id).innerText = saved;
-        }
+        if (saved) document.getElementById(id).innerText = saved;
     }
 
-    // 9개 카드 생성 및 데이터 로드
+    // 카드 생성 로직
     for (let i = 1; i <= 9; i++) {
         const unit = document.createElement('div');
         unit.className = 'card-unit';
@@ -175,8 +148,6 @@
             </div>
         `;
         grid.appendChild(unit);
-
-        // 데이터 복원
         loadTextData(`title-${i}`);
         loadTextData(`author-${i}`);
         const savedImg = localStorage.getItem(`img-${i}`);
@@ -195,11 +166,7 @@
                 const img = document.getElementById(`img-${idx}`);
                 img.src = e.target.result; 
                 img.style.display = 'block';
-                try {
-                    localStorage.setItem(`img-${idx}`, e.target.result);
-                } catch (err) {
-                    console.warn("image capacity is too large to be saved.");
-                }
+                try { localStorage.setItem(`img-${idx}`, e.target.result); } catch (err) {}
             };
             reader.readAsDataURL(input.files[0]);
         }
@@ -208,17 +175,38 @@
     async function saveImage() {
         const target = document.getElementById('capture-area');
         document.activeElement.blur();
-        const currentScroll = window.scrollY;
-        window.scrollTo(0, 0);
+        
+        // 1. 캡처용 복제본 생성
+        const clone = target.cloneNode(true);
+        const originalWidth = target.offsetWidth;
+        const sideMargin = originalWidth * 0.15; // 콘텐츠 너비의 15%를 여백으로 (좌우 총 30%)
+        const captureWidth = originalWidth + (sideMargin * 2);
+
+        clone.style.position = 'fixed';
+        clone.style.left = '-9999px';
+        clone.style.width = captureWidth + 'px';
+        clone.style.paddingLeft = sideMargin + 'px';
+        clone.style.paddingRight = sideMargin + 'px';
+        clone.style.paddingBottom = '100px';
+        clone.style.backgroundColor = '#ffffff';
+
+        // 2. 텍스트 직접 복사 (Node 복제 시 innerText 유실 방지)
+        clone.querySelector('#user-id').innerText = document.getElementById('user-id').innerText;
+        for(let i=1; i<=9; i++) {
+            clone.querySelector(`#title-${i}`).innerText = document.getElementById(`title-${i}`).innerText;
+            clone.querySelector(`#author-${i}`).innerText = document.getElementById(`author-${i}`).innerText;
+        }
+
+        document.body.appendChild(clone);
 
         try {
-            const canvas = await html2canvas(target, {
+            const canvas = await html2canvas(clone, {
                 scale: 2,
                 useCORS: true,
                 backgroundColor: '#ffffff',
-                logging: false,
-                width: target.offsetWidth,
-                height: target.offsetHeight
+                width: captureWidth,
+                height: clone.offsetHeight,
+                scrollY: -window.scrollY
             });
 
             const link = document.createElement('a');
@@ -226,13 +214,11 @@
             link.href = canvas.toDataURL('image/png');
             link.click();
         } catch (err) {
-            alert("save failed!");
+            alert("이미지 저장 실패");
         } finally {
-            window.scrollTo(0, currentScroll);
+            document.body.removeChild(clone);
         }
     }
 </script>
 </body>
 </html>
-
-
