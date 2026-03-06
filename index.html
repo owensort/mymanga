@@ -24,7 +24,7 @@
 
         #capture-area {
             background: #fff;
-            padding: 50px 20px; 
+            padding: 50px 20px 100px 20px; 
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -32,7 +32,6 @@
             max-width: 700px;
         }
 
-        /* [수정] div 기반의 편집 가능한 ID 영역 */
         .user-id-wrapper { 
             margin-bottom: 40px; 
             display: flex; 
@@ -46,25 +45,23 @@
             font-weight: bold; 
             font-size: 28px; 
             color: #000;
-            display: inline-block;
             line-height: 1.2;
         }
 
-        /* 편집 가능한 div 스타일 */
         .editable-div {
             outline: none;
             background: transparent;
             font-weight: bold;
             text-align: left;
             display: inline-block;
-            min-width: 20px;
-            line-height: 1.2;
-            word-break: break-all;
+            min-width: 10px;
+            line-height: 1.3;
+            word-break: break-all; /* 단어가 길어도 줄바꿈 */
+            white-space: pre-wrap; /* 공백 및 줄바꿈 유지 */
         }
 
         .user-id-edit { font-size: 28px; color: #000; }
 
-        /* [수정] Placeholder 효과 구현 */
         [contenteditable="true"]:empty:before {
             content: attr(placeholder);
             color: #ccc;
@@ -76,8 +73,9 @@
             flex-wrap: wrap; 
             width: 100%; 
             column-gap: 15px; 
-            row-gap: 25px;
+            row-gap: 30px; /* 세로 간격을 조금 더 넉넉히 */
             justify-content: center;
+            align-items: flex-start; /* 텍스트 길이에 따라 높이가 달라도 정렬 유지 */
         }
 
         .card-unit { 
@@ -100,14 +98,22 @@
             overflow: hidden; 
         }
 
+        /* 제목 영역이 길어지면 자동으로 아래로 밀림 */
+        .info-area {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+        }
+
         .title-edit { font-size: 18px; color: #000; width: 100%; }
         .author-edit { font-size: 13px; color: #666; width: 100%; }
 
         @media (min-width: 681px) { .image-container { border-width: 4px; } }
         
         @media (max-width: 680px) {
-            #capture-area { padding: 30px 10px; }
-            .grid-board { column-gap: 8px; row-gap: 15px; }
+            #capture-area { padding: 30px 10px 80px 10px; }
+            .grid-board { column-gap: 8px; row-gap: 20px; }
             .card-unit { width: calc((100% - (8px * 2)) / 3); }
             .user-id-prefix, .user-id-edit { font-size: 22px; }
             .title-edit { font-size: 14px; }
@@ -127,7 +133,7 @@
 <div id="capture-area">
     <div class="user-id-wrapper">
         <span class="user-id-prefix">@</span>
-        <div id="user-id" class="editable-div user-id-edit" contenteditable="true" placeholder="username"></div>
+        <div id="user-id" class="editable-div user-id-edit" contenteditable="true" placeholder="username" oninput="saveTextData('user-id', this.innerText)"></div>
     </div>
     <div class="grid-board" id="gridBoard"></div>
 </div>
@@ -141,7 +147,20 @@
 <script>
     const grid = document.getElementById('gridBoard');
 
-    // 9개 카드 생성
+    // 텍스트 데이터 저장 함수
+    function saveTextData(key, value) {
+        localStorage.setItem(key, value);
+    }
+
+    // 초기 로드 시 텍스트 복원
+    function loadTextData(id) {
+        const saved = localStorage.getItem(id);
+        if (saved) {
+            document.getElementById(id).innerText = saved;
+        }
+    }
+
+    // 9개 카드 생성 및 데이터 로드
     for (let i = 1; i <= 9; i++) {
         const unit = document.createElement('div');
         unit.className = 'card-unit';
@@ -152,19 +171,36 @@
                 <input type="file" class="file-input" accept="image/*" onchange="handleImageUpload(this, ${i})">
             </div>
             <div class="info-area">
-                <div id="title-${i}" class="editable-div title-edit" contenteditable="true" placeholder="TITLE"></div>
-                <div id="author-${i}" class="editable-div author-edit" contenteditable="true" placeholder="AUTHOR"></div>
+                <div id="title-${i}" class="editable-div title-edit" contenteditable="true" placeholder="TITLE" oninput="saveTextData('title-${i}', this.innerText)"></div>
+                <div id="author-${i}" class="editable-div author-edit" contenteditable="true" placeholder="AUTHOR" oninput="saveTextData('author-${i}', this.innerText)"></div>
             </div>
         `;
         grid.appendChild(unit);
+
+        // 데이터 복원
+        loadTextData(`title-${i}`);
+        loadTextData(`author-${i}`);
+        const savedImg = localStorage.getItem(`img-${i}`);
+        if (savedImg) {
+            const imgTag = document.getElementById(`img-${i}`);
+            imgTag.src = savedImg;
+            imgTag.style.display = 'block';
+        }
     }
+    loadTextData('user-id');
 
     function handleImageUpload(input, idx) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = document.getElementById(`img-${idx}`);
-                img.src = e.target.result; img.style.display = 'block';
+                img.src = e.target.result; 
+                img.style.display = 'block';
+                try {
+                    localStorage.setItem(`img-${idx}`, e.target.result);
+                } catch (err) {
+                    console.warn("이미지 용량이 너무 커서 저장되지 않았습니다.");
+                }
             };
             reader.readAsDataURL(input.files[0]);
         }
@@ -172,10 +208,7 @@
 
     async function saveImage() {
         const target = document.getElementById('capture-area');
-        
-        // 캡처 전 포커스 해제 (커서 제거)
         document.activeElement.blur();
-        
         const currentScroll = window.scrollY;
         window.scrollTo(0, 0);
 
