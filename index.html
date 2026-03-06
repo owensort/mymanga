@@ -13,8 +13,7 @@
         i { font-family: 'xeicon' !important; }
 
         body { 
-            background-color: #fff; 
-            font-family: 'PT Sans', sans-serif; 
+            background-color: #fff; font-family: 'PT Sans', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
             margin: 0; 
             display: flex; 
             flex-direction: column; 
@@ -199,7 +198,7 @@
                 try {
                     localStorage.setItem(`img-${idx}`, e.target.result);
                 } catch (err) {
-                    console.warn("이미지 용량이 너무 커서 저장되지 않았습니다.");
+                    console.warn("image capacity is too large to be saved.");
                 }
             };
             reader.readAsDataURL(input.files[0]);
@@ -227,7 +226,7 @@
             link.href = canvas.toDataURL('image/png');
             link.click();
         } catch (err) {
-            alert("저장 실패");
+            alert("save failed!");
         } finally {
             window.scrollTo(0, currentScroll);
         }
