@@ -9,144 +9,126 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
+        * { box-sizing: border-box; }
         i { font-family: 'xeicon' !important; }
 
-        body {
-            background-color: #fff;
-            font-family: 'PT Sans', sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding-top:50px;
+        body { 
+            background-color: #fff; 
+            font-family: 'PT Sans', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
         }
 
         #capture-area {
             background: #fff;
-            padding: 40px;
+            padding: 50px 20px; 
             width: 100%;
-            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
+            max-width: 700px;
         }
 
-        /* 상단 계정 영역: 입력 칸 기준 중앙 정렬 */
-        .user-id-wrapper {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 35px;
-            width: 100%;
-        }
-
-        .user-id-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        /* @ 기호를 레이아웃 너비 계산에서 제외 */
-        .user-id-prefix {
-            position: absolute;
-            right: 100%; /* 입력창 시작점 바로 왼쪽 */
-            top: 50%;
-            transform: translateY(-50%);
-            font-weight: bold;
-            color: #000;
-            font-size: clamp(18px, 4vw, 32px);
-            margin-right: 2px;
-            pointer-events: none;
-        }
-
-        .user-id-input {
-            border: none;
-            outline: none;
-            background: transparent;
-            font-family: 'PT Sans', sans-serif;
-            font-weight: bold;
-            color: #000;
-            font-size: clamp(18px, 4vw, 32px);
-            text-align: center; /* 입력 내용 중앙 정렬 */
-            min-width: 20px;
-            width: auto;
-        }
-
-        .grid-board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            width: 100%;
-        }
-
-        @media (min-width: 681px) {
-            #capture-area { max-width: 700px; }
-        }
-
-        @media (max-width: 680px) {
-            #capture-area { padding: 20px 15px; }
-            .grid-board { gap: 10px; }
-        }
-
-        .card-unit { display: flex; flex-direction: column; gap: 8px; width: 100%; }
-
-        .image-container {
-            width: 100%;
-            aspect-ratio: 3 / 4; 
-            position: relative;
-            background-color: #f9f9f9;
+        /* [수정] div 기반의 편집 가능한 ID 영역 */
+        .user-id-wrapper { 
+            margin-bottom: 40px; 
             display: flex; 
             justify-content: center; 
-            align-items: center;
-            border: 2px solid #000;
-            box-sizing: border-box;
-            overflow: hidden;
+            align-items: center; 
+            gap: 2px;
+            width: 100%;
         }
 
-        @media (min-width: 768px) { .image-container { border-width: 4px; } }
-
-        .xi-plus-circle { font-size: clamp(24px, 6vw, 80px); color: #000; z-index: 1; }
-
-        .preview-img {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
-            object-fit: cover; z-index: 2; display: none;
+        .user-id-prefix { 
+            font-weight: bold; 
+            font-size: 28px; 
+            color: #000;
+            display: inline-block;
+            line-height: 1.2;
         }
 
+        /* 편집 가능한 div 스타일 */
+        .editable-div {
+            outline: none;
+            background: transparent;
+            font-weight: bold;
+            text-align: left;
+            display: inline-block;
+            min-width: 20px;
+            line-height: 1.2;
+            word-break: break-all;
+        }
+
+        .user-id-edit { font-size: 28px; color: #000; }
+
+        /* [수정] Placeholder 효과 구현 */
+        [contenteditable="true"]:empty:before {
+            content: attr(placeholder);
+            color: #ccc;
+            display: block;
+        }
+
+        .grid-board { 
+            display: flex; 
+            flex-wrap: wrap; 
+            width: 100%; 
+            column-gap: 15px; 
+            row-gap: 25px;
+            justify-content: center;
+        }
+
+        .card-unit { 
+            width: calc((100% - (15px * 2)) / 3);
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            min-width: 0;
+        }
+
+        .image-container { 
+            width: 100%; 
+            aspect-ratio: 3 / 4; 
+            position: relative; 
+            background-color: #f9f9f9; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            border: 2px solid #000; 
+            overflow: hidden; 
+        }
+
+        .title-edit { font-size: 18px; color: #000; width: 100%; }
+        .author-edit { font-size: 13px; color: #666; width: 100%; }
+
+        @media (min-width: 681px) { .image-container { border-width: 4px; } }
+        
+        @media (max-width: 680px) {
+            #capture-area { padding: 30px 10px; }
+            .grid-board { column-gap: 8px; row-gap: 15px; }
+            .card-unit { width: calc((100% - (8px * 2)) / 3); }
+            .user-id-prefix, .user-id-edit { font-size: 22px; }
+            .title-edit { font-size: 14px; }
+            .author-edit { font-size: 11px; }
+        }
+        
+        .xi-plus-circle { font-size: 40px; color: #000; }
+        .preview-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; display: none; }
         .file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 3; }
 
-        .info-area { display: flex; flex-direction: column; gap: 2px; }
-
-        input[type="text"] {
-            width: 100%; border: none; outline: none; background: transparent;
-            font-family: 'PT Sans', sans-serif; font-weight: bold;
-        }
-
-        .title-input { font-size: clamp(12px, 2.2vw, 24px); color: #000; }
-        .author-input { font-size: clamp(9px, 1.6vw, 16px); color: #666; }
-
-        .controls { padding: 30px 0 60px; text-align: center; }
-
-        .btn-save {
-            width: 60px; height: 60px; font-size: 28px; background: #000; color: #fff;
-            border: none; border-radius: 50%; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;
-        }
-        .btn-save:hover { transform: scale(1.1); }
+        .controls { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1000; }
+        .btn-save { width: 65px; height: 65px; font-size: 30px; background: #000; color: #fff; border: none; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
 <div id="capture-area">
     <div class="user-id-wrapper">
-        <div class="user-id-container">
-            <span class="user-id-prefix">@</span>
-            <input type="text" id="user-id" class="user-id-input" placeholder="username" oninput="saveUserId()">
-        </div>
+        <span class="user-id-prefix">@</span>
+        <div id="user-id" class="editable-div user-id-edit" contenteditable="true" placeholder="username"></div>
     </div>
-
     <div class="grid-board" id="gridBoard"></div>
 </div>
 
@@ -159,24 +141,6 @@
 <script>
     const grid = document.getElementById('gridBoard');
 
-    // 계정 이름 로직
-    const userIdInput = document.getElementById('user-id');
-    const savedUserId = localStorage.getItem('user-id');
-    if (savedUserId) {
-        userIdInput.value = savedUserId;
-        autoWidth(userIdInput);
-    }
-
-    function saveUserId() {
-        localStorage.setItem('user-id', userIdInput.value);
-        autoWidth(userIdInput);
-    }
-
-    function autoWidth(el) {
-        // 입력 내용에 따라 너비를 조절하되 중앙 정렬 유지
-        el.style.width = (el.value.length || el.placeholder.length) + 1 + "ch";
-    }
-
     // 9개 카드 생성
     for (let i = 1; i <= 9; i++) {
         const unit = document.createElement('div');
@@ -188,27 +152,11 @@
                 <input type="file" class="file-input" accept="image/*" onchange="handleImageUpload(this, ${i})">
             </div>
             <div class="info-area">
-                <input type="text" id="title-${i}" class="title-input" placeholder="TITLE" oninput="saveData(${i})" onkeydown="handleEnter(event, ${i})">
-                <input type="text" id="author-${i}" class="author-input" placeholder="AUTHOR" oninput="saveData(${i})">
+                <div id="title-${i}" class="editable-div title-edit" contenteditable="true" placeholder="TITLE"></div>
+                <div id="author-${i}" class="editable-div author-edit" contenteditable="true" placeholder="AUTHOR"></div>
             </div>
         `;
         grid.appendChild(unit);
-
-        if(localStorage.getItem(`title-${i}`)) document.getElementById(`title-${i}`).value = localStorage.getItem(`title-${i}`);
-        if(localStorage.getItem(`author-${i}`)) document.getElementById(`author-${i}`).value = localStorage.getItem(`author-${i}`);
-        const savedImg = localStorage.getItem(`img-${i}`);
-        if (savedImg) {
-            const imgTag = document.getElementById(`img-${i}`);
-            imgTag.src = savedImg;
-            imgTag.style.display = 'block';
-        }
-    }
-
-    function handleEnter(event, idx) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            document.getElementById(`author-${idx}`).focus();
-        }
     }
 
     function handleImageUpload(input, idx) {
@@ -216,37 +164,41 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = document.getElementById(`img-${idx}`);
-                img.src = e.target.result;
-                img.style.display = 'block';
-                try { localStorage.setItem(`img-${idx}`, e.target.result); } catch (e) {}
+                img.src = e.target.result; img.style.display = 'block';
             };
             reader.readAsDataURL(input.files[0]);
         }
     }
 
-    function saveData(idx) {
-        localStorage.setItem(`title-${idx}`, document.getElementById(`title-${idx}`).value);
-        localStorage.setItem(`author-${idx}`, document.getElementById(`author-${idx}`).value);
-    }
-
-    function saveImage() {
+    async function saveImage() {
         const target = document.getElementById('capture-area');
-        html2canvas(target, {
-            scale: 2, 
-            useCORS: true,
-            backgroundColor: '#ffffff',
-            scrollX: 0,
-            scrollY: -window.scrollY,
-            windowWidth: 1000
-        }).then(canvas => {
+        
+        // 캡처 전 포커스 해제 (커서 제거)
+        document.activeElement.blur();
+        
+        const currentScroll = window.scrollY;
+        window.scrollTo(0, 0);
+
+        try {
+            const canvas = await html2canvas(target, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                logging: false,
+                width: target.offsetWidth,
+                height: target.offsetHeight
+            });
+
             const link = document.createElement('a');
-            link.download = `Comic_Grid_${Date.now()}.png`;
-            link.href = canvas.toDataURL();
+            link.download = `mymanga_${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
             link.click();
-        });
+        } catch (err) {
+            alert("저장 실패");
+        } finally {
+            window.scrollTo(0, currentScroll);
+        }
     }
 </script>
 </body>
-
 </html>
-
