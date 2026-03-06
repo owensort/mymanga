@@ -11,101 +11,38 @@
     <style>
         * { box-sizing: border-box; }
         i { font-family: 'xeicon' !important; }
+        body { background-color: #fff; font-family: 'PT Sans', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
 
-        body { 
-            background-color: #fff; 
-            font-family: 'PT Sans', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
-            -webkit-font-smoothing: antialiased;
-            letter-spacing:-1px;
-        }
-
-        /* [반응형 수정] 고정 너비를 제거하고 %와 max-width 사용 */
         #capture-area {
-            background: #fff;
-            padding: 8vw 5vw 8vw 5vw; 
-            width: 100%;
-            max-width: 900px; /* PC에서도 너무 퍼지지 않게 제한 */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background: #fff; padding: 8vw 5vw 180px 5vw; width: 100%; max-width: 900px;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        .user-id-wrapper { 
-            margin-bottom: 6vw; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 2px;
-            width: 100%;
-        }
+        .user-id-wrapper { margin-bottom: 4vw; display: flex; justify-content: center; align-items: center; gap: 4px; width: 100%; }
+        .user-id-prefix, .user-id-edit { font-weight: bold; font-size: clamp(16px, 8vw, 3em); color: #000; line-height: 1.1; }
 
-        .user-id-prefix { font-weight: bold; font-size: clamp(20px, 5vw, 32px); color: #000; line-height: 1.2; }
-        .user-id-edit { font-size: clamp(20px, 5vw, 32px); color: #000; }
+        .editable-div { outline: none; background: transparent; font-weight: bold; text-align: left; display: inline-block; min-width: 10px; word-break: break-all; white-space: pre-wrap; }
+        [contenteditable="true"]:empty:before { content: attr(placeholder); color: #ccc; }
 
-        .editable-div {
-            outline: none;
-            background: transparent;
-            font-weight: bold;
-            text-align: left;
-            display: inline-block;
-            min-width: 10px;
-            line-height: 1.3;
-            word-break: break-all;
-            white-space: pre-wrap;
-        }
-
-        [contenteditable="true"]:empty:before {
-            content: attr(placeholder);
-            color: #ccc;
-            display: block;
-        }
-
-        /* 그리드 간격도 반응형으로 조절 */
-        .grid-board { 
-            display: flex; 
-            flex-wrap: wrap; 
-            width: 100%; 
-            column-gap: 3%; 
-            row-gap: 2vw;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .card-unit { 
-            width: 31.33%; /* 3개 배치 (31.33*3 + 3*2 = 약 100) */
-            display: flex; 
-            flex-direction: column; 
-            gap: 1vw; 
-            min-width: 0;
-        }
+        .grid-board { display: flex; flex-wrap: wrap; width: 100%; column-gap: 1vw; row-gap: 2vw; justify-content: center; }
+        .card-unit { width: calc((100% - 2vw) / 3); display: flex; flex-direction: column; gap: 1vw; }
 
         .image-container { 
-            width: 100%; 
-            aspect-ratio: 3 / 4; 
-            position: relative; 
-            background-color: #f9f9f9; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            border: clamp(1px, 0.5vw, 2px) solid #000; 
-            overflow: hidden; 
+            width: 100%; aspect-ratio: 3 / 4; position: relative; background-color: #f9f9f9; 
+            display: flex; justify-content: center; align-items: center; 
+            border: clamp(1px, 0.5vw, 2px) solid #000; overflow: hidden; 
         }
 
-        .info-area { display: flex; flex-direction: column; width: 100%; }
-        .title-edit { font-size: clamp(10px, 2.5vw, 14px); color: #000; width: 100%; }
-        .author-edit { font-size: clamp(10px, 1.8vw, 14px); color: #666; width: 100%; }
+        .info-area { display: flex; flex-direction: column; gap: 0.3vw; width: 100%; }
+        .title-edit { font-size: clamp(10px, 6vw, 14px); color: #000; }
+        .author-edit { font-size: clamp(8px, 4vw, 11px); color: #666; }
 
-        .xi-plus-circle { font-size: clamp(10px, 6vw, 14px); color: #000; }
         .preview-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; display: none; }
         .file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 3; }
+        .xi-plus-circle { font-size: 24px; color: #000; }
 
         .controls { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; }
-        .btn-save { width: 65px; height: 65px; font-size: 30px; background: #000; color: #fff; border: none; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        .btn-save { width: 60px; height: 60px; font-size: 28px; background: #000; color: #fff; border: none; border-radius: 50%; cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
     </style>
 </head>
 <body>
@@ -113,27 +50,25 @@
 <div id="capture-area">
     <div class="user-id-wrapper">
         <span class="user-id-prefix">@</span>
-        <div id="user-id" class="editable-div user-id-edit" contenteditable="true" placeholder="username" oninput="saveTextData('user-id', this.innerText)"></div>
+        <div id="user-id" class="editable-div user-id-edit" contenteditable="true" placeholder="username"></div>
     </div>
     <div class="grid-board" id="gridBoard"></div>
 </div>
 
 <div class="controls">
-    <button class="btn-save" onclick="saveImage()">
-        <i class="xi-download"></i>
-    </button>
+    <button class="btn-save" onclick="saveImage()"><i class="xi-download"></i></button>
 </div>
 
 <script>
-    const grid = document.getElementById('gridBoard');
-
-    function saveTextData(key, value) { localStorage.setItem(key, value); }
-    function loadTextData(id) {
-        const saved = localStorage.getItem(id);
-        if (saved) document.getElementById(id).innerText = saved;
+    // 텍스트 로드/저장
+    function saveText(id, val) { localStorage.setItem(id, val); }
+    function loadText(id) { 
+        const v = localStorage.getItem(id); 
+        if(v) document.getElementById(id).innerText = v; 
     }
 
-    // 카드 생성 로직
+    // 그리드 생성
+    const grid = document.getElementById('gridBoard');
     for (let i = 1; i <= 9; i++) {
         const unit = document.createElement('div');
         unit.className = 'card-unit';
@@ -141,33 +76,32 @@
             <div class="image-container">
                 <i class="xi-plus-circle"></i>
                 <img id="img-${i}" class="preview-img">
-                <input type="file" class="file-input" accept="image/*" onchange="handleImageUpload(this, ${i})">
+                <input type="file" class="file-input" accept="image/*" onchange="handleImg(this, ${i})">
             </div>
             <div class="info-area">
-                <div id="title-${i}" class="editable-div title-edit" contenteditable="true" placeholder="TITLE" oninput="saveTextData('title-${i}', this.innerText)"></div>
-                <div id="author-${i}" class="editable-div author-edit" contenteditable="true" placeholder="AUTHOR" oninput="saveTextData('author-${i}', this.innerText)"></div>
+                <div id="t-${i}" class="editable-div title-edit" contenteditable="true" placeholder="TITLE" oninput="saveText('t-${i}', this.innerText)"></div>
+                <div id="a-${i}" class="editable-div author-edit" contenteditable="true" placeholder="AUTHOR" oninput="saveText('a-${i}', this.innerText)"></div>
             </div>
         `;
         grid.appendChild(unit);
-        loadTextData(`title-${i}`);
-        loadTextData(`author-${i}`);
+        loadText(`t-${i}`); loadText(`a-${i}`);
         const savedImg = localStorage.getItem(`img-${i}`);
-        if (savedImg) {
-            const imgTag = document.getElementById(`img-${i}`);
-            imgTag.src = savedImg;
-            imgTag.style.display = 'block';
+        if(savedImg) { 
+            const img = document.getElementById(`img-${i}`);
+            img.src = savedImg; img.style.display = 'block'; 
         }
     }
-    loadTextData('user-id');
+    loadText('user-id');
+    document.getElementById('user-id').addEventListener('input', (e) => saveText('user-id', e.target.innerText));
 
-    function handleImageUpload(input, idx) {
+    function handleImg(input, idx) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = document.getElementById(`img-${idx}`);
                 img.src = e.target.result; 
                 img.style.display = 'block';
-                try { localStorage.setItem(`img-${idx}`, e.target.result); } catch (err) {}
+                try { localStorage.setItem(`img-${idx}`, e.target.result); } catch(e) { console.warn("Quota Exceeded"); }
             };
             reader.readAsDataURL(input.files[0]);
         }
@@ -175,55 +109,53 @@
 
     async function saveImage() {
         const target = document.getElementById('capture-area');
-        document.activeElement.blur();
-        
-        // 1. 캡처용 복제본 생성
+        const exportWidth = 1080;
+        const sidePad = exportWidth * 0.1;
+
+        // 캡처용 가상 컨테이너
+        const wrapper = document.createElement('div');
+        Object.assign(wrapper.style, {
+            position: 'absolute', top: '-9999px', left: '0', width: exportWidth + 'px',
+            backgroundColor: '#ffffff', display: 'flex', justifyContent: 'center'
+        });
+
         const clone = target.cloneNode(true);
-        const originalWidth = target.offsetWidth;
-        const sideMargin = originalWidth * 0.15; // 콘텐츠 너비의 15%를 여백으로 (좌우 총 30%)
-        const captureWidth = originalWidth + (sideMargin * 2);
+        Object.assign(clone.style, {
+            width: (exportWidth - (sidePad * 2)) + 'px',
+            padding: '80px 0 120px 0', display: 'flex', flexDirection: 'column', alignItems: 'center'
+        });
 
-        clone.style.position = 'fixed';
-        clone.style.left = '-9999px';
-        clone.style.width = captureWidth + 'px';
-        clone.style.paddingLeft = sideMargin + 'px';
-        clone.style.paddingRight = sideMargin + 'px';
-        clone.style.paddingBottom = '100px';
-        clone.style.backgroundColor = '#ffffff';
+        wrapper.appendChild(clone);
+        document.body.appendChild(wrapper);
 
-        // 2. 텍스트 직접 복사 (Node 복제 시 innerText 유실 방지)
-        clone.querySelector('#user-id').innerText = document.getElementById('user-id').innerText;
+        // 텍스트 데이터 동기화
+        wrapper.querySelector('#user-id').innerText = document.getElementById('user-id').innerText;
         for(let i=1; i<=9; i++) {
-            clone.querySelector(`#title-${i}`).innerText = document.getElementById(`title-${i}`).innerText;
-            clone.querySelector(`#author-${i}`).innerText = document.getElementById(`author-${i}`).innerText;
+            wrapper.querySelector(`#t-${i}`).innerText = document.getElementById(`t-${i}`).innerText;
+            wrapper.querySelector(`#a-${i}`).innerText = document.getElementById(`a-${i}`).innerText;
         }
 
-        document.body.appendChild(clone);
-
         try {
-            const canvas = await html2canvas(clone, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                width: captureWidth,
-                height: clone.offsetHeight,
-                scrollY: -window.scrollY
+            const canvas = await html2canvas(wrapper, {
+                scale: 1, useCORS: true, logging: false, width: exportWidth, windowWidth: exportWidth
             });
 
-            const link = document.createElement('a');
-            link.download = `mymanga_${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            // [수정] DataURL 대신 Blob 사용 (파일 깨짐 방지)
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `mymanga_${Date.now()}.png`;
+                link.click();
+                URL.revokeObjectURL(url); // 메모리 해제
+            }, 'image/png');
+
         } catch (err) {
-            alert("이미지 저장 실패");
+            alert("이미지 생성 중 오류 발생");
         } finally {
-            document.body.removeChild(clone);
+            document.body.removeChild(wrapper);
         }
     }
 </script>
 </body>
 </html>
-
-
-
-
